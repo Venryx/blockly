@@ -438,7 +438,8 @@ Blockly.hideChaff = function(opt_allowToolbox) {
  */
 Blockly.getMainWorkspaceMetrics_ = function() {
   var svgSize = Blockly.svgSize(this.getParentSvg());
-  if (this.toolbox_) {
+  // custom removed
+  /*if (this.toolbox_) {
     if (this.toolboxPosition == Blockly.TOOLBOX_AT_TOP ||
         this.toolboxPosition == Blockly.TOOLBOX_AT_BOTTOM) {
       svgSize.height -= this.toolbox_.getHeight();
@@ -446,7 +447,7 @@ Blockly.getMainWorkspaceMetrics_ = function() {
         this.toolboxPosition == Blockly.TOOLBOX_AT_RIGHT) {
       svgSize.width -= this.toolbox_.getWidth();
     }
-  }
+  }*/
   // Set the margin to match the flyout's margin so that the workspace does
   // not jump as blocks are added.
   var MARGIN = Blockly.Flyout.prototype.CORNER_RADIUS - 1;
@@ -477,13 +478,15 @@ Blockly.getMainWorkspaceMetrics_ = function() {
     var bottomEdge = topEdge + blockBox.height;
   }
   var absoluteLeft = 0;
-  if (this.toolbox_ && this.toolboxPosition == Blockly.TOOLBOX_AT_LEFT) {
+  // custom removed
+  /*if (this.toolbox_ && this.toolboxPosition == Blockly.TOOLBOX_AT_LEFT) {
     absoluteLeft = this.toolbox_.getWidth();
-  }
+  }*/
   var absoluteTop = 0;
-  if (this.toolbox_ && this.toolboxPosition == Blockly.TOOLBOX_AT_TOP) {
+  // custom removed
+  /*if (this.toolbox_ && this.toolboxPosition == Blockly.TOOLBOX_AT_TOP) {
     absoluteTop = this.toolbox_.getHeight();
-  }
+  }*/
 
   var metrics = {
     viewHeight: svgSize.height,

@@ -83,9 +83,12 @@ class Gen_uncompressed(threading.Thread):
 var isNodeJS = !!(typeof module !== 'undefined' && module.exports &&
                   typeof window === 'undefined');
 
+// custom
+var closureLibraryRoot = "/../ClosureLibrary/";
+				  
 if (isNodeJS) {
   var window = {};
-  require('../closure-library/closure/goog/bootstrap/nodejs');
+  require(closureLibraryRoot + 'closure/goog/bootstrap/nodejs'); // custom changed
 }
 
 window.BLOCKLY_DIR = (function() {
@@ -107,7 +110,7 @@ window.BLOCKLY_DIR = (function() {
 window.BLOCKLY_BOOT = function() {
   var dir = '';
   if (isNodeJS) {
-    require('../closure-library/closure/goog/bootstrap/nodejs');
+    require(closureLibraryRoot + 'closure/goog/bootstrap/nodejs'); // custom changed
     dir = 'blockly';
   } else {
     // Execute after Closure has loaded.
@@ -154,7 +157,7 @@ if (isNodeJS) {
   document.write('<script>var goog = undefined;</script>');
   // Load fresh Closure Library.
   document.write('<script src="' + window.BLOCKLY_DIR +
-      '/../closure-library/closure/goog/base.js"></script>');
+      closureLibraryRoot + 'closure/goog/base.js"></script>'); // custom changed
   document.write('<script>window.BLOCKLY_BOOT();</script>');
 }
 """)
@@ -180,6 +183,9 @@ class Gen_compressed(threading.Thread):
     self.gen_generator("php")
     self.gen_generator("dart")
     self.gen_generator("lua")
+    
+    # custom
+    self.gen_generator("csharp")
 
   def gen_core(self):
     target_filename = "blockly_compressed.js"
