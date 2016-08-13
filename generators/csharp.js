@@ -40,59 +40,62 @@ Blockly.CSharp.ORDER_ASSIGNMENT = 14;    // = += -= *= /= %= <<= >>= ...
 Blockly.CSharp.ORDER_COMMA = 15;         // ,
 Blockly.CSharp.ORDER_NONE = 99;          // (...)
 
-/**
- * Arbitrary code to inject into locations that risk causing infinite loops.
+/**Arbitrary code to inject into locations that risk causing infinite loops.
  * Any instances of '%1' will be replaced by the block ID that failed.
  * E.g. '  checkTimeout(%1);\n'
- * @type ?string
- */
+ * @type ?string*/
 Blockly.CSharp.INFINITE_LOOP_TRAP = null;
 
+/**Initialise the database of variable names.
+ * @param {!Blockly.Workspace} workspace Workspace to generate code from.*/
 Blockly.CSharp.init = function(workspace) {
-  Blockly.CSharp.definitions_ = {};
+	// Create a dictionary of definitions to be printed before the code.
+	Blockly.CSharp.definitions_ = {};
+	// Create a dictionary mapping desired function names in definitions_
+	// to actual function names (to avoid collisions with user functions).
+	Blockly.JavaScript.functionNames_ = {};
 
-  if (Blockly.Variables) {
-    if (!Blockly.CSharp.variableDB_) {
-      Blockly.CSharp.variableDB_ =
-          new Blockly.Names(Blockly.CSharp.RESERVED_WORDS_);
-    } else {
-      Blockly.CSharp.variableDB_.reset();
-    }
+	if (!Blockly.CSharp.variableDB_)
+		Blockly.CSharp.variableDB_ = new Blockly.Names(Blockly.CSharp.RESERVED_WORDS_);
+	else
+		Blockly.CSharp.variableDB_.reset();
 
-    var defvars = [];
-    defvars = defvars.concat(Blockly.CSharp.getDefinitions(workspace));
-    defvars = defvars.concat(Blockly.CSharp.getDefinitions(workspace, 'inferbool'));
-    defvars = defvars.concat(Blockly.CSharp.getDefinitions(workspace, 'inferdouble'));
-    Blockly.CSharp.definitions_['variables'] = defvars.join('\n');
-  }
+	var defvars = [];
+	defvars = defvars.concat(Blockly.CSharp.getDefinitions(workspace));
+	defvars = defvars.concat(Blockly.CSharp.getDefinitions(workspace, 'inferbool'));
+	defvars = defvars.concat(Blockly.CSharp.getDefinitions(workspace, 'inferdouble'));
+	Blockly.CSharp.definitions_['variables'] = defvars.join('\n');
 }
-
 Blockly.CSharp.getDefinitions = function(workspace, type) {
-  var defvars = [];
-  var variables = Blockly.Variables.allVariables(workspace, type);
-  for (var x = 0; x < variables.length; x++) {
-    var name = Blockly.CSharp.variableDB_.getName(variables[x],
-      Blockly.Variables.NAME_TYPE);
-    var prefix = 'dynamic ';
-    if(type && type.startsWith('infer')) {
-      prefix = "Variable<" + type.substr(5) + "> ";
-    }
-    defvars[x] = prefix + name + ";";
-  }
-  return defvars;
+	var defvars = [];
+	var variables = Blockly.Variables.allVariables(workspace, type);
+	for (var x = 0; x < variables.length; x++) {
+		var name = Blockly.CSharp.variableDB_.getName(variables[x],
+		  Blockly.Variables.NAME_TYPE);
+		var prefix = 'dynamic ';
+		if (type && type.startsWith('infer'))
+			prefix = "Variable<" + type.substr(5) + "> ";
+		defvars[x] = prefix + name + ";";
+	}
+	return defvars;
 };
 
-/* Prepend the generated code with the variable definitions. */
-Blockly.CSharp.build_definitions = function() {
-  var definitions = [];
-  for (var name in Blockly.CSharp.definitions_) {
-    definitions.push(Blockly.CSharp.definitions_[name]);
-  }
-  return definitions.join('\n\n') + '\n\n\n';
-};
-
+/**
+ * Prepend the generated code with the variable definitions.
+ * @param {string} code Generated code.
+ * @return {string} Completed code.
+ */
 Blockly.CSharp.finish = function(code) {
-  return code;
+	// Convert the definitions dictionary into a list.
+	var definitions = [];
+	for (var name in Blockly.CSharp.definitions_) {
+		definitions.push(Blockly.CSharp.definitions_[name]);
+	}
+	// Clean up temporary data.
+	delete Blockly.CSharp.definitions_;
+	delete Blockly.CSharp.functionNames_;
+	Blockly.CSharp.variableDB_.reset();
+	return definitions.join('\n\n') + '\n\n\n' + code;
 };
 
 /**
@@ -102,11 +105,11 @@ Blockly.CSharp.finish = function(code) {
  * @return {string} Legal line of code.
  */
 Blockly.CSharp.scrubNakedValue = function(line) {
-  return line + ';\n';
+	return line + ';\n';
 };
 
 Blockly.CSharp.quote_ = function(val) {
-  return goog.string.quote(val);
+	return goog.string.quote(val);
 };
 
 /**
@@ -120,33 +123,33 @@ Blockly.CSharp.quote_ = function(val) {
  * @private
  */
 Blockly.CSharp.scrub_ = function(block, code) {
-  if (code === null) {
-    // Block has handled code generation itself.
-    return '';
-  }
-  var commentCode = '';
-  // Only collect comments for blocks that aren't inline.
-  if (!block.outputConnection || !block.outputConnection.targetConnection) {
-    // Collect comment for this block.
-    var comment = block.getCommentText();
-    if (comment) {
-      commentCode += this.prefixLines(comment, '// ') + '\n';
-    }
-    // Collect comments for all value arguments.
-    // Don't collect comments for nested statements.
-    for (var x = 0; x < block.inputList.length; x++) {
-      if (block.inputList[x].type == Blockly.INPUT_VALUE) {
-        var childBlock = block.inputList[x].connection.targetBlock();
-        if (childBlock) {
-          var comment = this.allNestedComments(childBlock);
-          if (comment) {
-            commentCode += this.prefixLines(comment, '// ');
-          }
-        }
-      }
-    }
-  }
-  var nextBlock = block.nextConnection && block.nextConnection.targetBlock();
-  var nextCode = this.blockToCode(nextBlock);
-  return commentCode + code + nextCode;
+	if (code === null) {
+		// Block has handled code generation itself.
+		return '';
+	}
+	var commentCode = '';
+	// Only collect comments for blocks that aren't inline.
+	if (!block.outputConnection || !block.outputConnection.targetConnection) {
+		// Collect comment for this block.
+		var comment = block.getCommentText();
+		if (comment) {
+			commentCode += this.prefixLines(comment, '// ') + '\n';
+		}
+		// Collect comments for all value arguments.
+		// Don't collect comments for nested statements.
+		for (var x = 0; x < block.inputList.length; x++) {
+			if (block.inputList[x].type == Blockly.INPUT_VALUE) {
+				var childBlock = block.inputList[x].connection.targetBlock();
+				if (childBlock) {
+					var comment = this.allNestedComments(childBlock);
+					if (comment) {
+						commentCode += this.prefixLines(comment, '// ');
+					}
+				}
+			}
+		}
+	}
+	var nextBlock = block.nextConnection && block.nextConnection.targetBlock();
+	var nextCode = this.blockToCode(nextBlock);
+	return commentCode + code + nextCode;
 };

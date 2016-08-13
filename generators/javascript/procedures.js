@@ -63,8 +63,7 @@ Blockly.JavaScript['procedures_defreturn'] = function(block) {
 
 // Defining a procedure without a return value uses the same generator as
 // a procedure with a return value.
-Blockly.JavaScript['procedures_defnoreturn'] =
-    Blockly.JavaScript['procedures_defreturn'];
+Blockly.JavaScript['procedures_defnoreturn'] =Blockly.JavaScript['procedures_defreturn'];
 
 Blockly.JavaScript['procedures_callreturn'] = function(block) {
   // Call a procedure with a return value.

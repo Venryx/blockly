@@ -12,3 +12,14 @@
 .blocklyMainBackground {
     stroke: initial !important;
 }
+
+.blocklyFlyout .blocklyScrollbarHandle {
+    fill: #999 !important;
+}
+.blocklyFlyout .blocklyScrollbarHandle:hover {
+    fill: #888 !important;
+}
+
+.blocklyWidgetDiv * {
+    font-variant: normal;
+}

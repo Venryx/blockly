@@ -347,9 +347,8 @@ Blockly.Flyout.prototype.setMetrics_ = function(xyRatio) {
     this.workspace_.scrollX = -metrics.contentWidth * xyRatio.x;
   }
 
-  // custom removed
-  /*this.workspace_.translate(this.workspace_.scrollX + metrics.absoluteLeft,
-      this.workspace_.scrollY + metrics.absoluteTop);*/
+  this.workspace_.translate(this.workspace_.scrollX + metrics.absoluteLeft,
+      this.workspace_.scrollY + metrics.absoluteTop);
 };
 
 /**
